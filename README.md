@@ -1,6 +1,8 @@
 `no-role-annots`
 ================
 
+[![Build Status](https://travis-ci.org/goldfirere/no-role-annots.svg?branch=master)](https://travis-ci.org/goldfirere/no-role-annots)
+
 This package is intended to ease the transition from GHC 7.6.3- to GHC 7.8+
 by providing a backward-compatible role annotation syntax. The module
 `Language.Haskell.RoleAnnots` exports backward-compatible declarations
