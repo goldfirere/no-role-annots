@@ -4,28 +4,44 @@
    https://github.com/goldfirere/no-role-annots/
 -}
 
-{-# LANGUAGE TemplateHaskell, GADTs, CPP #-}
+{-# LANGUAGE TemplateHaskell, CPP, GeneralizedNewtypeDeriving,
+             StandaloneDeriving #-}
 
 module Test.Test where
 
-#if __GLASGOW_HASKELL__ >= 707
+#if __GLASGOW_HASKELL__ < 707
+import Language.Haskell.RoleAnnots
+#else
 import Language.Haskell.TH
 #endif
 
-import Language.Haskell.RoleAnnots
+import Test.Defns
 import Language.Haskell.RoleAnnots.Check
 
 import System.Exit
 
-data MyMap1 k v = MkMyMap1 [(k,v)]
-data MyMap2 k v = (Nominal k, Representational v) => MkMyMap2 [(k,v)]
-data MyPtr1 a = MkMyPtr1 Int
-data MyPtr2 a = Representational a => MkMyPtr2 Int
+class C a where
+  mymap :: MyMap2 String a
 
+instance C Int where
+  mymap = mkMap2 "Foo" 3
+
+newtype Age = MkAge Int
+  deriving C
+
+class D a where
+  mymap' :: MyMap2 a String
+
+instance D Int where
+  mymap' = mkMap2 3 "Foo"
+
+-- deriving instance D Age   -- shouldn't work
+  
 checkRoles ''MyMap1 [RepresentationalR, RepresentationalR]
 checkRoles ''MyMap2 [NominalR, RepresentationalR]
 checkRoles ''MyPtr1 [PhantomR]
 checkRoles ''MyPtr2 [RepresentationalR]
+checkRoles ''MyMap3 [NominalR, RepresentationalR]
 
 -- checkRoles ''MyMap1 [NominalR, RepresentationalR]  -- should report error
 

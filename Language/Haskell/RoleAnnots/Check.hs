@@ -13,7 +13,7 @@
 --
 ----------------------------------------------------------------------------
 
-{-# LANGUAGE CPP, TemplateHaskell, DeriveDataTypeable #-}
+{-# LANGUAGE CPP #-}
 
 module Language.Haskell.RoleAnnots.Check (
   checkRoles, checkRolesB,
@@ -22,11 +22,12 @@ module Language.Haskell.RoleAnnots.Check (
   Role(..)
   ) where
 
-import Language.Haskell.TH
+import Language.Haskell.TH.Syntax
 
 #if __GLASGOW_HASKELL__ < 707
-import Data.Data  ( Data, Typeable )
+import Language.Haskell.RoleAnnots   ( Role(..) )
 #else
+import Language.Haskell.TH.Ppr
 import Control.Monad  ( when )
 #endif
 
@@ -81,15 +82,10 @@ checkRoles _n _desired = do
 checkRolesB :: Name -> [Role] -> Q Exp
 checkRolesB _n _desired = do
 #if __GLASGOW_HASKELL__ < 707
-  [| True |]
+  return (ConE trueName)
 #else
   actual <- reifyRoles _n
   if actual == _desired
-  then [| True |]
-  else [| False |]
-#endif
-
-#if __GLASGOW_HASKELL__ < 707
-data Role = NominalR | RepresentationalR | PhantomR
-  deriving (Show, Eq, Data, Typeable)
+  then return (ConE trueName)
+  else return (ConE falseName)
 #endif
