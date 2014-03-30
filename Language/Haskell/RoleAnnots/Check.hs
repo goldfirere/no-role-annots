@@ -13,7 +13,7 @@
 --
 ----------------------------------------------------------------------------
 
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP, TemplateHaskell #-}
 
 module Language.Haskell.RoleAnnots.Check (
   checkRoles, checkRolesB,
@@ -86,6 +86,6 @@ checkRolesB _n _desired = do
 #else
   actual <- reifyRoles _n
   if actual == _desired
-  then return (ConE trueName)
-  else return (ConE falseName)
+  then [| True |]
+  else [| False |]
 #endif
