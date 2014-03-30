@@ -82,7 +82,7 @@ checkRoles _n _desired = do
 checkRolesB :: Name -> [Role] -> Q Exp
 checkRolesB _n _desired = do
 #if __GLASGOW_HASKELL__ < 707
-  return (ConE trueName)
+  [| True |]
 #else
   actual <- reifyRoles _n
   if actual == _desired
