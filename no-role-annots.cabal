@@ -1,5 +1,5 @@
 name:           no-role-annots
-version:        1.0
+version:        1.1
 cabal-version:  >= 1.10
 synopsis:       Role annotations without -XRoleAnnotations
 homepage:       https://github.com/goldfirere/no-role-annots
@@ -33,7 +33,7 @@ description:
 source-repository this
   type:     git
   location: https://github.com/goldfirere/no-role-annots.git
-  tag:      v1.0
+  tag:      v1.1
 
 library
   build-depends:      
