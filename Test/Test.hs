@@ -42,6 +42,7 @@ checkRoles ''MyMap2 [NominalR, RepresentationalR]
 checkRoles ''MyPtr1 [PhantomR]
 checkRoles ''MyPtr2 [RepresentationalR]
 checkRoles ''MyMap3 [NominalR, RepresentationalR]
+checkRoles ''MyMap4 [NominalR, RepresentationalR]
 
 -- checkRoles ''MyMap1 [NominalR, RepresentationalR]  -- should report error
 

@@ -11,13 +11,16 @@
 -- roles stricter in your datatypes. Here is a typical use case:
 --
 -- > -- Use an association list as a map:
--- > data Map k v =
--- >   (Nominal k, Representational v) => MkMap [(k,v)]
+-- > data (Nominal k, Representational v) => Map k v = MkMap [(k,v)]
 --
 -- With a declaration such as this, GHC will assign correct roles to @k@
 -- and @v@. In versions of GHC before roles, these constraints have no
--- effect. The constraints need be put on only one data constructor, though
--- there is no harm in duplicating them.
+-- effect. You will need to make sure the language extension
+-- @-XDatatypeContexts@ is enabled. This extension is enabled by default
+-- with a default language of either Haskell98 or Haskell2010, but not
+-- by default with a vanilla invocation of GHC. When enabling it manually,
+-- you may also want to specify @-fno-warn-deprecated-flags@, as datatype
+-- contexts are generally a misfeature.
 --
 -- Note that these constraints can only make roles stricter, such as a
 -- change from representational to nominal. Indeed, going the other way
@@ -25,10 +28,6 @@
 -- has the role given -- the guarantee is only that a parameter as
 -- /at least/ the role given. (Thus, 'Phantom' is always redundant and
 -- is included only for completeness.)
---
--- Unfortunately, the trick above does not work for @newtype@s, which
--- cannot accept constraints. The only solution there is Template Haskell.
--- Use the function 'roleAnnot'.
 --
 -- To check that the roles are what you would
 -- expect, see module "Language.Haskell.RoleAnnots.Check".
@@ -72,26 +71,9 @@ type role Representational representational
 type role Phantom phantom
 #endif
 
--- | A backward-compatible (almost) role annotation. To use, write code like
--- this:
---
--- > roleAnnot [NominalR, RepresentationalR]
--- >   [d| newtype MyMap k v = MkMyMap [(k,v)] |]
---
--- You will, of course, need @-XTemplateHaskell@.
---
--- The "almost" above refers to the fact that this will require the
--- @-XRoleAnnotations@ extension. How to avoid using @CPP@ in this case?
--- Put the extension in your .cabal file, like this:
---
--- > if impl(ghc >= 7.8)
--- >   default-extensions: RoleAnnotations
---
--- (Cabal files need no @endif@ -- they use indentation to detect the
--- body of the conditional.)
---
--- You can check this out in action in the
--- <https://github.com/goldfirere/no-role-annots/blob/master/no-role-annots.cabal cabal file> for no-role-annots (in the @test-suite@ section).
+{-# DEPRECATED roleAnnot "The `roleAnnot` function is not necessary. Use a role constraint in a datatype context instead." #-}
+-- | Deprecated since role inference looks at datatype contexts (with the release
+-- of GHC 7.8).
 roleAnnot :: [Role] -> Q [Dec] -> Q [Dec]
 roleAnnot _roles qdecs = do
 #if __GLASGOW_HASKELL__ < 707
@@ -110,6 +92,6 @@ roleAnnot _roles qdecs = do
 #if __GLASGOW_HASKELL__ < 707
 -- | This declaration mirrors the declaration within Template Haskell, for
 -- use in earlier versions of GHC.
-data Role = NominalR | RepresentationalR | PhantomR
+data Role = NominalR | RepresentationalR | PhantomR | InferR
   deriving (Show, Eq, Data, Typeable)
 #endif
